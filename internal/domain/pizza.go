@@ -9,3 +9,8 @@ type Pizza struct {
 	Price    int    `json:"price" bson:"price"`
 	Rating   int    `json:"rating" bson:"rating"`
 }
+
+type PizzaFitlerReq struct {
+	SortBy  *string `query:"sortBy"`
+	OrderBy *string `query:"orderBy"`
+}

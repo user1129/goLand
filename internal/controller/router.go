@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/zdos/dodo_pizza/internal/domain"
 	"github.com/zdos/dodo_pizza/internal/repository"
 )
 
@@ -27,7 +28,24 @@ func (r *Router) Init() *echo.Echo {
 	}))
 
 	eRouter.GET("/pizza", func(ctx echo.Context) error {
-		result, err := r.pizzaRepo.GetPizzaList(ctx.Request().Context())
+		filter := new(domain.PizzaFitlerReq)
+
+		if err := ctx.Bind(filter); err != nil {
+			return ctx.JSON(http.StatusBadRequest, err)
+		}
+
+		if filter.SortBy == nil {
+			defaultSort := "asc"
+			filter.SortBy = &defaultSort
+		}
+
+		if filter.OrderBy == nil {
+			defaultOrderBy := ""
+			filter.OrderBy = &defaultOrderBy
+
+		}
+
+		result, err := r.pizzaRepo.GetPizzaList(ctx.Request().Context(), filter)
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}

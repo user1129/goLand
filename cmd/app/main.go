@@ -14,7 +14,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	opts := options.Client().ApplyURI("mongodb+srv://admin:root@cluster0.bu48yln.mongodb.net/pizza_db?retryWrites=true&w=majority")
+	opts := options.Client().ApplyURI("mongodb://root:example@localhost:27017/pizza_db?authSource=admin")
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {

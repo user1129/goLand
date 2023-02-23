@@ -3,14 +3,16 @@ package repository
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/zdos/dodo_pizza/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type PizzaDb interface {
-	GetPizzaList(ctx context.Context) ([]domain.Pizza, error)
+	GetPizzaList(ctx context.Context, filter *domain.PizzaFitlerReq) ([]domain.Pizza, error)
 }
 
 type pizzaRepo struct {
@@ -23,8 +25,14 @@ func NewPizzaRepo(db *mongo.Database) *pizzaRepo {
 	}
 }
 
-func (r *pizzaRepo) GetPizzaList(ctx context.Context) ([]domain.Pizza, error) {
-	pizzaList, err := r.pizzaCollection.Find(ctx, bson.D{{}})
+func (r *pizzaRepo) GetPizzaList(ctx context.Context, filter *domain.PizzaFitlerReq) ([]domain.Pizza, error) {
+	mfilter := bson.D{}
+	orderByValue := 1
+	if strings.ToLower(*filter.OrderBy) == "desc" {
+		orderByValue = -1
+	}
+	opts := options.Find().SetSort(bson.D{{Key: *filter.SortBy, Value: orderByValue}})
+	pizzaList, err := r.pizzaCollection.Find(ctx, mfilter, opts)
 	if err != nil {
 		return nil, err
 	}
