@@ -7,6 +7,7 @@ import (
 
 	"github.com/zdos/dodo_pizza/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -31,6 +32,11 @@ func (r *pizzaRepo) GetPizzaList(ctx context.Context, filter *domain.PizzaFitler
 	if strings.ToLower(*filter.OrderBy) == "desc" {
 		orderByValue = -1
 	}
+
+	if filter.Category != nil {
+		mfilter = append(mfilter, primitive.E{Key: "category", Value: *filter.Category})
+	}
+
 	opts := options.Find().SetSort(bson.D{{Key: *filter.SortBy, Value: orderByValue}})
 	pizzaList, err := r.pizzaCollection.Find(ctx, mfilter, opts)
 	if err != nil {
